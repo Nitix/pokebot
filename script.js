@@ -39,6 +39,7 @@ let configureDungeon = () => {
   let moveToTop = true;
   let sizeChanged = false;
   let hasMoveLeftOrRightOnce = false;
+  let openedChests = 0;
 
   const getBossPosition = () => {
     const tile = document.querySelector(".tile-boss, .tile-ladder");
@@ -93,7 +94,7 @@ let configureDungeon = () => {
 
   const allChestsDiscovered = () => {
     const chests = document.querySelectorAll(".tile-chest");
-    return chests.length + DungeonRunner.chestsOpened() === size;
+    return chests.length + openedChests === size;
   };
 
   const wantedChestsStillPresents = () => {
@@ -173,6 +174,7 @@ let configureDungeon = () => {
     if (
       DungeonRunner.map.currentTile().type() === GameConstants.DungeonTile.chest
     ) {
+      openedChests++;
       interact();
       return;
     }
