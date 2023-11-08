@@ -36,10 +36,8 @@ let configureDungeon = () => {
   let initial = true;
   let moveToRight = true;
   let moveToTop = true;
-  let expectedRow = size - 1;
   let sizeChanged = false;
   let hasMoveLeftOrRightOnce = false;
-  let hasInteracted = false;
 
   const getBossPosition = () => {
     const tile = document.querySelector(".tile-boss");
@@ -93,7 +91,6 @@ let configureDungeon = () => {
     document.dispatchEvent(event);
     if (!force && hasMoveLeftOrRightOnce) {
       moveToRight = !moveToRight;
-      expectedRow = positionY - 1;
       hasMoveLeftOrRightOnce = false;
     }
     requestAnimationFrame(interact);
@@ -109,7 +106,6 @@ let configureDungeon = () => {
     document.dispatchEvent(event);
     if (!force && hasMoveLeftOrRightOnce) {
       moveToRight = !moveToRight;
-      expectedRow = positionY + 1;
       hasMoveLeftOrRightOnce = false;
     }
     requestAnimationFrame(interact);
@@ -194,14 +190,6 @@ let configureDungeon = () => {
       }
     }
 
-    /*if (expectedRow > positionY) {
-      moveDown();
-      return;
-    }
-    if (expectedRow !== positionY && positionY !== 0) {
-      moveUp();
-      return;
-    }*/
     if (initial) {
       moveLeft();
       if (positionX <= 0) {
