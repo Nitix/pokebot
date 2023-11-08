@@ -3,6 +3,8 @@ let startButtonSelector =
 
 let stop = false;
 
+let chestMode = "epic";
+
 let startDungeon = () => {
   if (stop) {
     console.log("Stop requested");
@@ -24,12 +26,40 @@ let configureDungeon = () => {
   const middle = Math.floor(size / 2);
   let positionX = middle;
   let positionY = size - 1;
+  let positionXBoss = null;
+  let positionYBoss = null;
+  let positionXChest = null;
+  let positionYChest = null;
   let initial = true;
   let moveToRight = true;
   let expectedRow = size - 1;
   let sizeChanged = false;
   let hasMoveLeftOrRightOnce = false;
   let hasInteracted = false;
+
+  const getBossPosition = () => {
+    const tile = document.querySelector(".tile-boss");
+    if (!tile) {
+      positionXBoss = null;
+      positionYBoss = null;
+      return;
+    }
+    const parent = tile.parentElement;
+    positionXBoss = [...parent.children].indexOf(tile);
+    positionYBoss = [...parent.parentElement.children].indexOf(parent);
+  };
+
+  const getChestPosition = (chestMode) => {
+    const tile = document.querySelector(`.tile-chest-${chestMode}`);
+    if (!tile) {
+      positionXChest = null;
+      positionYChest = null;
+      return;
+    }
+    const parent = tile.parentElement;
+    positionXChest = [...parent.children].indexOf(tile);
+    positionYChest = [...parent.parentElement.children].indexOf(parent);
+  };
 
   const getCurrentPlayerPosition = () => {
     const tile = document.querySelector(".tile-player");
@@ -116,6 +146,38 @@ let configureDungeon = () => {
       requestAnimationFrame(configureDungeon);
       return;
     }
+
+    if (chestMode) {
+      getChestPosition(chestMode);
+      if (positionXChest !== null && positionYChest !== null) {
+        console.log(`Go to ${chestMode} chest`);
+        if (positionYChest < positionY) {
+          moveUp();
+          return;
+        } else if (positionXChest < positionX) {
+          moveLeft();
+          return;
+        } else if (positionXChest > positionX) {
+          moveRight();
+          return;
+        }
+      }
+    }
+    getBossPosition();
+    if (positionXBoss !== null && positionYBoss !== null) {
+      console.log("Go to boss");
+      if (positionYBoss < positionY) {
+        moveUp();
+        return;
+      } else if (positionXBoss < positionX) {
+        moveLeft();
+        return;
+      } else if (positionXBoss > positionX) {
+        moveRight();
+        return;
+      }
+    }
+
     if (expectedRow > positionY) {
       moveDown();
       return;
@@ -161,6 +223,7 @@ let configureDungeon = () => {
       requestAnimationFrame(move);
       return;
     }
+
     const event = new KeyboardEvent("keydown", {
       key: "Space",
       code: "Space",
