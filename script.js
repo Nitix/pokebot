@@ -35,6 +35,7 @@ let configureDungeon = () => {
   let positionYChest = null;
   let initial = true;
   let moveToRight = true;
+  let moveToTop = true;
   let expectedRow = size - 1;
   let sizeChanged = false;
   let hasMoveLeftOrRightOnce = false;
@@ -193,14 +194,14 @@ let configureDungeon = () => {
       }
     }
 
-    if (expectedRow > positionY) {
+    /*if (expectedRow > positionY) {
       moveDown();
       return;
     }
     if (expectedRow !== positionY && positionY !== 0) {
       moveUp();
       return;
-    }
+    }*/
     if (initial) {
       moveLeft();
       if (positionX <= 0) {
@@ -208,8 +209,15 @@ let configureDungeon = () => {
       }
       return;
     }
+    if (positionY === 0) {
+      moveToTop = false;
+    }
     if (moveToRight) {
       if (positionX === size - 1) {
+        if (!moveToTop) {
+          moveDown();
+          return;
+        }
         moveUp();
         return;
       }
@@ -217,6 +225,10 @@ let configureDungeon = () => {
       return;
     } else {
       if (positionX === 0) {
+        if (!moveToTop) {
+          moveDown();
+          return;
+        }
         moveUp();
         return;
       }
