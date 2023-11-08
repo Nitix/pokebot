@@ -41,7 +41,7 @@ let configureDungeon = () => {
   let hasMoveLeftOrRightOnce = false;
 
   const getBossPosition = () => {
-    const tile = document.querySelector(".tile-boss");
+    const tile = document.querySelector(".tile-boss, .tile-ladder");
     if (!tile) {
       positionXBoss = null;
       positionYBoss = null;
@@ -52,14 +52,18 @@ let configureDungeon = () => {
     positionYBoss = [...parent.parentElement.children].indexOf(parent);
   };
 
-  const getChestPosition = (chestMode) => {
+  const wantedChests = (chestMode) => {
     let query = "";
     if (Array.isArray(chestMode)) {
       query = chestMode.map((mode) => `.tile-chest-${mode}`).join(",");
     } else {
       query = `.tile-chest-${chestMode}`;
     }
-    const tiles = document.querySelectorAll(query);
+    return document.querySelectorAll(query);
+  };
+
+  const getChestPosition = (chestMode) => {
+    const tiles = wantedChests(chestMode);
     if (!tiles || !tiles.length) {
       positionXChest = null;
       positionYChest = null;
@@ -87,6 +91,16 @@ let configureDungeon = () => {
     sizeChanged = parent.children.length !== size;
   };
 
+  const allChestsDiscovered = () => {
+    const chests = document.querySelectorAll(".tile-chest");
+    return chests.length + DungeonRunner.chestsOpened() === size;
+  };
+
+  const wantedChestsStillPresents = () => {
+    const chests = wantedChests(chestMode);
+    return chests.length > 0 || !allChestsDiscovered();
+  };
+
   const moveUp = (force = false) => {
     console.log("Moving up");
     const event = new KeyboardEvent("keydown", {
@@ -98,7 +112,7 @@ let configureDungeon = () => {
       moveToRight = !moveToRight;
       hasMoveLeftOrRightOnce = false;
     }
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveDown = (force = false) => {
@@ -113,7 +127,7 @@ let configureDungeon = () => {
       moveToRight = !moveToRight;
       hasMoveLeftOrRightOnce = false;
     }
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveLeft = () => {
@@ -124,7 +138,7 @@ let configureDungeon = () => {
     });
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveRight = () => {
@@ -135,7 +149,7 @@ let configureDungeon = () => {
     });
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const goToTile = (X, Y) => {
@@ -153,6 +167,33 @@ let configureDungeon = () => {
       return true;
     }
     return false;
+  };
+
+  const chooseWhatToDo = () => {
+    if (
+      DungeonRunner.map.currentTile().type() === GameConstants.DungeonTile.chest
+    ) {
+      interact();
+      return;
+    }
+    if (
+      DungeonRunner.map.currentTile().type() ===
+        GameConstants.DungeonTile.boss &&
+      !wantedChestsStillPresents()
+    ) {
+      interact();
+      return;
+    }
+    if (
+      DungeonRunner.map.currentTile().type() ===
+        GameConstants.DungeonTile.ladder &&
+      !wantedChestsStillPresents()
+    ) {
+      interact();
+      return;
+    }
+    move();
+    return;
   };
 
   const move = () => {
@@ -186,12 +227,14 @@ let configureDungeon = () => {
         }
       }
     }
-    getBossPosition();
-    if (positionXBoss !== null && positionYBoss !== null) {
-      console.log("Go to boss");
-      const moved = goToTile(positionXBoss, positionYBoss);
-      if (moved) {
-        return;
+    if (!wantedChestsStillPresents()) {
+      getBossPosition();
+      if (positionXBoss !== null && positionYBoss !== null) {
+        console.log("Go to boss");
+        const moved = goToTile(positionXBoss, positionYBoss);
+        if (moved) {
+          return;
+        }
       }
     }
 
@@ -244,11 +287,7 @@ let configureDungeon = () => {
       return;
     }
 
-    const event = new KeyboardEvent("keydown", {
-      key: "Space",
-      code: "Space",
-    });
-    document.dispatchEvent(event);
+    DungeonRunner.handleInteraction();
     requestAnimationFrame(move);
   };
 
