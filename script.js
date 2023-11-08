@@ -439,10 +439,10 @@ let configureDungeon = () => {
       return 1_000_000;
     }
     if (tile.classList.contains("tile-invisible")) {
-      return 10;
+      return 3;
     }
     if (tile.classList.contains("tile-enemy")) {
-      return 100;
+      return 10;
     }
     return 1;
   };
