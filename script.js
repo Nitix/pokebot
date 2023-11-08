@@ -13,7 +13,7 @@ let startDungeon = () => {
   const button = document.querySelector(startButtonSelector);
   if (button) {
     button.click();
-    requestAnimationFrame(configureDungeon, 2000);
+    requestAnimationFrame(configureDungeon);
     return;
   }
 };
