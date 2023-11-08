@@ -3,7 +3,7 @@ let startButtonSelector =
 
 let stop = false;
 
-let chestMode = "epic";
+let chestMode = ["epic", "rare"];
 
 let startDungeon = () => {
   if (stop) {
@@ -50,7 +50,13 @@ let configureDungeon = () => {
   };
 
   const getChestPosition = (chestMode) => {
-    const tiles = document.querySelectorAll(`.tile-chest-${chestMode}`);
+    let query = "";
+    if (Array.isArray(chestMode)) {
+      query = chestMode.map((mode) => `.tile-chest-${mode}`).join(",");
+    } else {
+      query = `.tile-chest-${chestMode}`;
+    }
+    const tiles = document.querySelectorAll(query);
     if (!tiles || !tiles.length) {
       positionXChest = null;
       positionYChest = null;
