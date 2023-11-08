@@ -33,6 +33,7 @@ let configureDungeon = () => {
   let positionYBoss = null;
   let positionXChest = null;
   let positionYChest = null;
+  let choosenChestName = "";
   let initial = true;
   let moveToRight = true;
   let moveToTop = true;
@@ -65,6 +66,10 @@ let configureDungeon = () => {
       return;
     }
     const lastTile = tiles[tiles.length - 1];
+    choosenChestName = lastTile.className
+      .split(" ")
+      .find((e) => e.includes("tile-chest-"))
+      .substring(11);
     const parent = lastTile.parentElement;
     positionXChest = [...parent.children].indexOf(lastTile);
     positionYChest = [...parent.parentElement.children].indexOf(parent);
@@ -174,7 +179,7 @@ let configureDungeon = () => {
     if (chestMode) {
       getChestPosition(chestMode);
       if (positionXChest !== null && positionYChest !== null) {
-        console.log(`Go to ${chestMode} chest`);
+        console.log(`Go to ${choosenChestName} chest`);
         const moved = goToTile(positionXChest, positionYChest);
         if (moved) {
           return;
