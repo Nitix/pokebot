@@ -5,7 +5,10 @@ let stop = false;
 
 let chestMode = ["epic", "rare", "legendary"];
 
-let startDungeon = () => {
+let startDungeon = (init = false) => {
+  if (init) {
+    stop = false;
+  }
   if (stop) {
     console.log("Stop requested");
     return;
