@@ -70,14 +70,38 @@ let configureDungeon = () => {
       positionYChest = null;
       return;
     }
-    const lastTile = tiles[tiles.length - 1];
-    chosenChestName = lastTile.className
-      .split(" ")
-      .find((e) => e.includes("tile-chest-"))
-      .substring(11);
-    const parent = lastTile.parentElement;
-    positionXChest = [...parent.children].indexOf(lastTile);
-    positionYChest = [...parent.parentElement.children].indexOf(parent);
+    const tile = Array.from(tiles).reduceRight(
+      (prev, current) => {
+        let chosenChestName = current.className
+          .split(" ")
+          .find((e) => e.includes("tile-chest-"))
+          .substring(11);
+        const parent = current.parentElement;
+        let positionXChest = [...parent.children].indexOf(current);
+        let positionYChest = [...parent.parentElement.children].indexOf(parent);
+        let distance =
+          Math.abs(positionX - positionXChest) +
+          Math.abs(positionY - positionYChest);
+        if (prev.distance < distance) {
+          return prev;
+        }
+        return {
+          distance,
+          positionXChest,
+          positionYChest,
+          chosenChestName,
+        };
+      },
+      {
+        distance: Infinity,
+        positionXChest: null,
+        positionYChest: null,
+        chosenChestName: "",
+      }
+    );
+    positionXChest = tile.positionXChest;
+    positionYChest = tile.positionYChest;
+    chosenChestName = tile.chosenChestName;
   };
 
   const getCurrentPlayerPosition = () => {
