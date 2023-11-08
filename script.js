@@ -3,7 +3,7 @@ let startButtonSelector =
 
 let stop = false;
 
-let chestMode = ["rare", "epic", "legendary", "mythic"];
+let chestMode = ["epic", "rare", "legendary"];
 
 let startDungeon = (init = false) => {
   if (init) {
@@ -16,7 +16,7 @@ let startDungeon = (init = false) => {
   const button = document.querySelector(startButtonSelector);
   if (button) {
     button.click();
-    setTimeout(configureDungeon, 15);
+    requestAnimationFrame(configureDungeon);
     return;
   }
 };
@@ -113,7 +113,7 @@ let configureDungeon = () => {
       moveToRight = !moveToRight;
       hasMoveLeftOrRightOnce = false;
     }
-    setTimeout(chooseWhatToDo, 15);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveDown = (force = false) => {
@@ -128,7 +128,7 @@ let configureDungeon = () => {
       moveToRight = !moveToRight;
       hasMoveLeftOrRightOnce = false;
     }
-    setTimeout(chooseWhatToDo, 15);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveLeft = () => {
@@ -139,7 +139,7 @@ let configureDungeon = () => {
     });
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
-    setTimeout(chooseWhatToDo, 15);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveRight = () => {
@@ -150,7 +150,7 @@ let configureDungeon = () => {
     });
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
-    setTimeout(chooseWhatToDo, 15);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const goToTile = (X, Y) => {
@@ -204,18 +204,18 @@ let configureDungeon = () => {
     }
     if (!isDungeonStillRunning()) {
       console.log("Dungeon finished");
-      setTimeout(startDungeon, 15);
+      requestAnimationFrame(startDungeon);
       return;
     }
 
     if (DungeonRunner.fighting() || DungeonBattle.catching()) {
-      setTimeout(move, 15);
+      requestAnimationFrame(move);
       return;
     }
 
     getCurrentPlayerPosition();
     if (sizeChanged) {
-      setTimeout(configureDungeon, 15);
+      requestAnimationFrame(configureDungeon);
       return;
     }
 
@@ -280,18 +280,18 @@ let configureDungeon = () => {
     }
     if (!isDungeonStillRunning()) {
       console.log("Dungeon finished");
-      setTimeout(startDungeon, 15);
+      requestAnimationFrame(startDungeon);
       return;
     }
     getCurrentPlayerPosition();
     if (positionX === middle && positionY === size - 1) {
-      setTimeout(move, 15);
+      requestAnimationFrame(move);
       return;
     }
 
     DungeonRunner.handleInteraction();
-    setTimeout(move, 15);
+    requestAnimationFrame(move);
   };
 
-  setTimeout(move, 15);
+  requestAnimationFrame(move);
 };
