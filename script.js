@@ -95,7 +95,7 @@ let configureDungeon = () => {
     requestAnimationFrame(interact);
   };
 
-  const moveDown = () => {
+  const moveDown = (force = false) => {
     // Fix move two
     console.log("Moving down");
     const event = new KeyboardEvent("keydown", {
@@ -103,6 +103,11 @@ let configureDungeon = () => {
       code: "ArrowDown",
     });
     document.dispatchEvent(event);
+    if (!force && hasMoveLeftOrRightOnce) {
+      moveToRight = !moveToRight;
+      expectedRow = positionY + 1;
+      hasMoveLeftOrRightOnce = false;
+    }
     requestAnimationFrame(interact);
   };
 
@@ -126,6 +131,23 @@ let configureDungeon = () => {
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
     requestAnimationFrame(interact);
+  };
+
+  const goToTile = (X, Y) => {
+    if (Y < positionY) {
+      moveUp();
+      return true;
+    } else if (Y > positionY) {
+      moveDown();
+      return true;
+    } else if (X < positionX) {
+      moveLeft();
+      return true;
+    } else if (X > positionX) {
+      moveRight();
+      return true;
+    }
+    return false;
   };
 
   const move = () => {
@@ -158,14 +180,8 @@ let configureDungeon = () => {
       getChestPosition(chestMode);
       if (positionXChest !== null && positionYChest !== null) {
         console.log(`Go to ${chestMode} chest`);
-        if (positionYChest < positionY) {
-          moveUp();
-          return;
-        } else if (positionXChest < positionX) {
-          moveLeft();
-          return;
-        } else if (positionXChest > positionX) {
-          moveRight();
+        const moved = goToTile(positionXChest, positionYChest);
+        if (moved) {
           return;
         }
       }
@@ -173,14 +189,8 @@ let configureDungeon = () => {
     getBossPosition();
     if (positionXBoss !== null && positionYBoss !== null) {
       console.log("Go to boss");
-      if (positionYBoss < positionY) {
-        moveUp();
-        return;
-      } else if (positionXBoss < positionX) {
-        moveLeft();
-        return;
-      } else if (positionXBoss > positionX) {
-        moveRight();
+      const moved = goToTile(positionXBoss, positionYBoss);
+      if (moved) {
         return;
       }
     }
