@@ -153,6 +153,24 @@ let configureDungeon = () => {
     requestAnimationFrame(chooseWhatToDo);
   };
 
+  const moveToChest = (chestMode) => {
+    getChestPosition(chestMode);
+    if (positionXChest === null || positionYChest === null) {
+      return false;
+    }
+    console.log(`Go to ${chosenChestName} chest`);
+    return goToTile(positionXChest, positionYChest);
+  };
+
+  const moveToBoss = () => {
+    getBossPosition();
+    if (positionXBoss === null && positionYBoss === null) {
+      return false;
+    }
+    console.log("Go to boss");
+    return goToTile(positionXBoss, positionYBoss);
+  };
+
   const goToTile = (X, Y) => {
     if (Y < positionY) {
       moveUp();
@@ -220,43 +238,18 @@ let configureDungeon = () => {
     }
 
     if (chestMode) {
-      getChestPosition(chestMode);
-      if (positionXChest !== null && positionYChest !== null) {
-        console.log(`Go to ${chosenChestName} chest`);
-        const moved = goToTile(positionXChest, positionYChest);
-        if (moved) {
-          return;
-        }
+      if (moveToChest(chestMode)) {
+        return;
       }
-
-      if (!wantedChestsStillPresents()) {
-        getBossPosition();
-        if (positionXBoss !== null && positionYBoss !== null) {
-          console.log("Go to boss");
-          const moved = goToTile(positionXBoss, positionYBoss);
-          if (moved) {
-            return;
-          }
-        }
+      if (!wantedChestsStillPresents() && moveToBoss()) {
+        return;
       }
-      getChestPosition(["common", "rare", "epic", "legendary", "mythic"]);
-      if (positionXChest !== null && positionYChest !== null) {
-        console.log(`Go to ${chosenChestName} chest`);
-        const moved = goToTile(positionXChest, positionYChest);
-        if (moved) {
-          return;
-        }
+      if (moveToChest(["common", "rare", "epic", "legendary", "mythic"])) {
+        return;
       }
     } else {
-      if (!moveToTop) {
-        getBossPosition();
-        if (positionXBoss !== null && positionYBoss !== null) {
-          console.log("Go to boss");
-          const moved = goToTile(positionXBoss, positionYBoss);
-          if (moved) {
-            return;
-          }
-        }
+      if (!moveToTop && moveToBoss()) {
+        return;
       }
     }
 
