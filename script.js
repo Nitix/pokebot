@@ -3,7 +3,7 @@ let startButtonSelector =
 
 let stop = false;
 
-let chestMode = ["epic", "rare", "legendary"];
+let chestMode = ["rare", "epic", "legendary", "mythic"];
 
 let startDungeon = (init = false) => {
   if (init) {
