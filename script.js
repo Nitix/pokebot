@@ -51,7 +51,7 @@ let configureDungeon = () => {
 
   const getChestPosition = (chestMode) => {
     const tiles = document.querySelectorAll(`.tile-chest-${chestMode}`);
-    if (!tile || !tiles.length) {
+    if (!tiles || !tiles.length) {
       positionXChest = null;
       positionYChest = null;
       return;
