@@ -33,7 +33,7 @@ let configureDungeon = () => {
   let positionYBoss = null;
   let positionXChest = null;
   let positionYChest = null;
-  let choosenChestName = "";
+  let chosenChestName = "";
   let initial = true;
   let moveToRight = true;
   let moveToTop = true;
@@ -71,7 +71,7 @@ let configureDungeon = () => {
       return;
     }
     const lastTile = tiles[tiles.length - 1];
-    choosenChestName = lastTile.className
+    chosenChestName = lastTile.className
       .split(" ")
       .find((e) => e.includes("tile-chest-"))
       .substring(11);
@@ -222,20 +222,40 @@ let configureDungeon = () => {
     if (chestMode) {
       getChestPosition(chestMode);
       if (positionXChest !== null && positionYChest !== null) {
-        console.log(`Go to ${choosenChestName} chest`);
+        console.log(`Go to ${chosenChestName} chest`);
         const moved = goToTile(positionXChest, positionYChest);
         if (moved) {
           return;
         }
       }
-    }
-    if (!wantedChestsStillPresents()) {
-      getBossPosition();
-      if (positionXBoss !== null && positionYBoss !== null) {
-        console.log("Go to boss");
-        const moved = goToTile(positionXBoss, positionYBoss);
+
+      if (!wantedChestsStillPresents()) {
+        getBossPosition();
+        if (positionXBoss !== null && positionYBoss !== null) {
+          console.log("Go to boss");
+          const moved = goToTile(positionXBoss, positionYBoss);
+          if (moved) {
+            return;
+          }
+        }
+      }
+      getChestPosition(["common", "rare", "epic", "legendary", "mythic"]);
+      if (positionXChest !== null && positionYChest !== null) {
+        console.log(`Go to ${chosenChestName} chest`);
+        const moved = goToTile(positionXChest, positionYChest);
         if (moved) {
           return;
+        }
+      }
+    } else {
+      if (!moveToTop) {
+        getBossPosition();
+        if (positionXBoss !== null && positionYBoss !== null) {
+          console.log("Go to boss");
+          const moved = goToTile(positionXBoss, positionYBoss);
+          if (moved) {
+            return;
+          }
         }
       }
     }
