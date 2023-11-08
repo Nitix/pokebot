@@ -50,14 +50,15 @@ let configureDungeon = () => {
   };
 
   const getChestPosition = (chestMode) => {
-    const tile = document.querySelector(`.tile-chest-${chestMode}`);
-    if (!tile) {
+    const tiles = document.querySelectorAll(`.tile-chest-${chestMode}`);
+    if (!tiles || !tiles.length) {
       positionXChest = null;
       positionYChest = null;
       return;
     }
-    const parent = tile.parentElement;
-    positionXChest = [...parent.children].indexOf(tile);
+    const lastTile = tiles[tiles.length - 1];
+    const parent = lastTile.parentElement;
+    positionXChest = [...parent.children].indexOf(lastTile);
     positionYChest = [...parent.parentElement.children].indexOf(parent);
   };
 
