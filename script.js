@@ -3,7 +3,7 @@ let startButtonSelector =
 
 let stop = false;
 
-let chestMode = ["epic", "rare"];
+let chestMode = ["epic", "rare", "legendary"];
 
 let startDungeon = () => {
   if (stop) {
@@ -161,11 +161,6 @@ let configureDungeon = () => {
     }
 
     if (DungeonRunner.fighting() || DungeonBattle.catching()) {
-      if (!hasInteracted) {
-        hasInteracted = true;
-        requestAnimationFrame(interact);
-        return;
-      }
       requestAnimationFrame(move);
       return;
     }
