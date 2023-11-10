@@ -3,7 +3,7 @@ let startButtonSelector =
 
 let stop = false;
 
-let chestMode = ["epic", "rare", "legendary"];
+let chestMode = ["rare", "epic", "legendary", "mythic"];
 
 let startDungeon = (init = false) => {
   if (init) {
@@ -33,15 +33,16 @@ let configureDungeon = () => {
   let positionYBoss = null;
   let positionXChest = null;
   let positionYChest = null;
-  let choosenChestName = "";
+  let chosenChestName = "";
   let initial = true;
   let moveToRight = true;
   let moveToTop = true;
   let sizeChanged = false;
   let hasMoveLeftOrRightOnce = false;
+  let openedChests = 0;
 
   const getBossPosition = () => {
-    const tile = document.querySelector(".tile-boss");
+    const tile = document.querySelector(".tile-boss, .tile-ladder");
     if (!tile) {
       positionXBoss = null;
       positionYBoss = null;
@@ -52,27 +53,55 @@ let configureDungeon = () => {
     positionYBoss = [...parent.parentElement.children].indexOf(parent);
   };
 
-  const getChestPosition = (chestMode) => {
+  const wantedChests = (chestMode) => {
     let query = "";
     if (Array.isArray(chestMode)) {
       query = chestMode.map((mode) => `.tile-chest-${mode}`).join(",");
     } else {
       query = `.tile-chest-${chestMode}`;
     }
-    const tiles = document.querySelectorAll(query);
+    return document.querySelectorAll(query);
+  };
+
+  const getChestPosition = (chestMode) => {
+    const tiles = wantedChests(chestMode);
     if (!tiles || !tiles.length) {
       positionXChest = null;
       positionYChest = null;
       return;
     }
-    const lastTile = tiles[tiles.length - 1];
-    choosenChestName = lastTile.className
-      .split(" ")
-      .find((e) => e.includes("tile-chest-"))
-      .substring(11);
-    const parent = lastTile.parentElement;
-    positionXChest = [...parent.children].indexOf(lastTile);
-    positionYChest = [...parent.parentElement.children].indexOf(parent);
+    const tile = Array.from(tiles).reduceRight(
+      (prev, current) => {
+        let chosenChestName = current.className
+          .split(" ")
+          .find((e) => e.includes("tile-chest-"))
+          .substring(11);
+        const parent = current.parentElement;
+        let positionXChest = [...parent.children].indexOf(current);
+        let positionYChest = [...parent.parentElement.children].indexOf(parent);
+        let distance =
+          Math.abs(positionX - positionXChest) +
+          Math.abs(positionY - positionYChest);
+        if (prev.distance < distance) {
+          return prev;
+        }
+        return {
+          distance,
+          positionXChest,
+          positionYChest,
+          chosenChestName,
+        };
+      },
+      {
+        distance: Infinity,
+        positionXChest: null,
+        positionYChest: null,
+        chosenChestName: "",
+      }
+    );
+    positionXChest = tile.positionXChest;
+    positionYChest = tile.positionYChest;
+    chosenChestName = tile.chosenChestName;
   };
 
   const getCurrentPlayerPosition = () => {
@@ -87,6 +116,16 @@ let configureDungeon = () => {
     sizeChanged = parent.children.length !== size;
   };
 
+  const allChestsDiscovered = () => {
+    const chests = document.querySelectorAll(".tile-chest");
+    return chests.length + openedChests === size;
+  };
+
+  const wantedChestsStillPresents = () => {
+    const chests = wantedChests(chestMode);
+    return chests.length > 0 || !allChestsDiscovered();
+  };
+
   const moveUp = (force = false) => {
     console.log("Moving up");
     const event = new KeyboardEvent("keydown", {
@@ -98,7 +137,7 @@ let configureDungeon = () => {
       moveToRight = !moveToRight;
       hasMoveLeftOrRightOnce = false;
     }
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveDown = (force = false) => {
@@ -113,7 +152,7 @@ let configureDungeon = () => {
       moveToRight = !moveToRight;
       hasMoveLeftOrRightOnce = false;
     }
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveLeft = () => {
@@ -124,7 +163,7 @@ let configureDungeon = () => {
     });
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
   };
 
   const moveRight = () => {
@@ -135,10 +174,33 @@ let configureDungeon = () => {
     });
     hasMoveLeftOrRightOnce = true;
     document.dispatchEvent(event);
-    requestAnimationFrame(interact);
+    requestAnimationFrame(chooseWhatToDo);
+  };
+
+  const moveToChest = (chestMode) => {
+    getChestPosition(chestMode);
+    if (positionXChest === null || positionYChest === null) {
+      return false;
+    }
+    console.log(`Go to ${chosenChestName} chest`);
+    return goToTile(positionXChest, positionYChest);
+  };
+
+  const moveToBoss = () => {
+    getBossPosition();
+    if (positionXBoss === null && positionYBoss === null) {
+      return false;
+    }
+    console.log("Go to boss");
+    return goToTile(positionXBoss, positionYBoss);
   };
 
   const goToTile = (X, Y) => {
+    const next = aStarAlgorithm({ x: positionX, y: positionY }, { x: X, y: Y });
+    if (next) {
+      X = next.x;
+      Y = next.y;
+    }
     if (Y < positionY) {
       moveUp();
       return true;
@@ -153,6 +215,34 @@ let configureDungeon = () => {
       return true;
     }
     return false;
+  };
+
+  const chooseWhatToDo = () => {
+    if (
+      DungeonRunner.map.currentTile().type() === GameConstants.DungeonTile.chest
+    ) {
+      openedChests++;
+      interact();
+      return;
+    }
+    if (
+      DungeonRunner.map.currentTile().type() ===
+        GameConstants.DungeonTile.boss &&
+      !wantedChestsStillPresents()
+    ) {
+      interact();
+      return;
+    }
+    if (
+      DungeonRunner.map.currentTile().type() ===
+        GameConstants.DungeonTile.ladder &&
+      !wantedChestsStillPresents()
+    ) {
+      interact();
+      return;
+    }
+    move();
+    return;
   };
 
   const move = () => {
@@ -177,20 +267,17 @@ let configureDungeon = () => {
     }
 
     if (chestMode) {
-      getChestPosition(chestMode);
-      if (positionXChest !== null && positionYChest !== null) {
-        console.log(`Go to ${choosenChestName} chest`);
-        const moved = goToTile(positionXChest, positionYChest);
-        if (moved) {
-          return;
-        }
+      if (moveToChest(chestMode)) {
+        return;
       }
-    }
-    getBossPosition();
-    if (positionXBoss !== null && positionYBoss !== null) {
-      console.log("Go to boss");
-      const moved = goToTile(positionXBoss, positionYBoss);
-      if (moved) {
+      if (!wantedChestsStillPresents() && moveToBoss()) {
+        return;
+      }
+      if (moveToChest(["common", "rare", "epic", "legendary", "mythic"])) {
+        return;
+      }
+    } else {
+      if (!moveToTop && moveToBoss()) {
         return;
       }
     }
@@ -244,12 +331,120 @@ let configureDungeon = () => {
       return;
     }
 
-    const event = new KeyboardEvent("keydown", {
-      key: "Space",
-      code: "Space",
-    });
-    document.dispatchEvent(event);
+    DungeonRunner.handleInteraction();
     requestAnimationFrame(move);
+  };
+
+  /**
+   * A* algorithm
+   * @param {Object} start
+   * @param {number} start.x
+   * @param {number} start.y
+   * @param {Object} end
+   * @param {number} end.x
+   * @param {number} end.y
+   */
+  const aStarAlgorithm = (start, end) => {
+    try {
+      if (start.x === end.x && start.y === end.y) {
+        console.log("Already on the tile");
+        return null;
+      }
+      let openSet = [
+        {
+          x: start.x,
+          y: start.y,
+          parent: null,
+          gScore: 0,
+          fScore: distance(start, end),
+        },
+      ];
+      while (openSet.length) {
+        let current = openSet.reduce((prev, current) => {
+          if (!prev) {
+            return current;
+          }
+          if (current.fScore < prev.fScore) {
+            return current;
+          }
+          return prev;
+        }, null);
+        if (current.x === end.x && current.y === end.y) {
+          let path = [current];
+          while (current.parent) {
+            path.push(current.parent);
+            current = current.parent;
+          }
+          return path[path.length - 2];
+        }
+        openSet = openSet.filter((e) => e !== current);
+        const neighbors = [
+          { x: current.x - 1, y: current.y },
+          { x: current.x + 1, y: current.y },
+          { x: current.x, y: current.y - 1 },
+          { x: current.x, y: current.y + 1 },
+        ];
+        for (const neighbor of neighbors) {
+          if (
+            neighbor.x < 0 ||
+            neighbor.x >= size ||
+            neighbor.y < 0 ||
+            neighbor.y >= size
+          ) {
+            continue;
+          }
+          if (neighbor.x === current.x && neighbor.y === current.y) {
+            continue;
+          }
+          const gScore =
+            current.gScore + tileGScore(`${neighbor.x},${neighbor.y}`);
+          const fScore = gScore + distance(neighbor, end);
+          const existing = openSet.find(
+            (e) => e.x === neighbor.x && e.y === neighbor.y
+          );
+          if (existing) {
+            if (existing.gScore > gScore) {
+              existing.gScore = gScore;
+              existing.fScore = fScore;
+              existing.parent = current;
+            }
+          } else {
+            openSet.push({
+              x: neighbor.x,
+              y: neighbor.y,
+              parent: current,
+              gScore,
+              fScore,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e.message);
+      return null;
+    }
+  };
+
+  const distance = (start, end) => {
+    return Math.abs(start.x - end.x) + Math.abs(start.y - end.y);
+  };
+
+  const tileGScore = (id) => {
+    const [x, y] = id.split(",");
+    const board = document.querySelector(".dungeon-board > tbody:nth-child(1)");
+    const row = board.children[y];
+    const tile = row.children[x];
+    if (!tile) {
+      console.log("Not found", id, x, y);
+      return 1_000_000;
+    }
+    if (tile.classList.contains("tile-invisible")) {
+      return 3;
+    }
+    if (tile.classList.contains("tile-enemy")) {
+      return 10;
+    }
+    return 1;
   };
 
   requestAnimationFrame(move);
