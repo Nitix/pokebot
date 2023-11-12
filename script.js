@@ -11,19 +11,13 @@ let startDungeon = (init = false, options = {}) => {
     stop = false;
   }
 
-  if (options && Object.keys(options).length) {
-    Object.keys(options).forEach((key) => {
-      switch (key) {
-        case "chestMode":
-          chestMode = options[key];
-          break;
-        case "verbose":
-          verbose = options[key];
-          break;
-        default:
-          break;
-      }
-    });
+  if (options) {
+    if (options.chestMode) {
+      chestMode = options[key];
+    }
+    if (options.verbose) {
+      verbose = options.verbose;
+    }
   }
 
   if (stop) {
