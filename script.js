@@ -4,15 +4,33 @@ let startButtonSelector =
 let stop = false;
 
 let chestMode = ["rare", "epic", "legendary", "mythic"];
+let verbose = false;
 
-let startDungeon = (init = false) => {
+let startDungeon = (init = false, options = {}) => {
   if (init) {
     stop = false;
   }
+
+  if (options && Object.keys(options).length) {
+    Object.keys(options).forEach((key) => {
+      switch (key) {
+        case "chestMode":
+          chestMode = options[key];
+          break;
+        case "verbose":
+          verbose = options[key];
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
   if (stop) {
     console.log("Stop requested");
     return;
   }
+
   const button = document.querySelector(startButtonSelector);
   if (button) {
     button.click();
@@ -127,7 +145,7 @@ let configureDungeon = () => {
   };
 
   const moveUp = (force = false) => {
-    console.log("Moving up");
+    verbose && console.log("Moving up");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowUp",
       code: "ArrowUp",
@@ -141,8 +159,7 @@ let configureDungeon = () => {
   };
 
   const moveDown = (force = false) => {
-    // Fix move two
-    console.log("Moving down");
+    verbose && console.log("Moving down");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowDown",
       code: "ArrowDown",
@@ -156,7 +173,7 @@ let configureDungeon = () => {
   };
 
   const moveLeft = () => {
-    console.log("Moving left");
+    verbose && console.log("Moving left");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowLeft",
       code: "ArrowLeft",
@@ -167,7 +184,7 @@ let configureDungeon = () => {
   };
 
   const moveRight = () => {
-    console.log("Moving right");
+    verbose && console.log("Moving right");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowRight",
       code: "ArrowRight",
@@ -182,7 +199,7 @@ let configureDungeon = () => {
     if (positionXChest === null || positionYChest === null) {
       return false;
     }
-    console.log(`Go to ${chosenChestName} chest`);
+    verbose && console.log(`Go to ${chosenChestName} chest`);
     return goToTile(positionXChest, positionYChest);
   };
 
@@ -191,7 +208,7 @@ let configureDungeon = () => {
     if (positionXBoss === null && positionYBoss === null) {
       return false;
     }
-    console.log("Go to boss");
+    verbose && console.log("Go to boss");
     return goToTile(positionXBoss, positionYBoss);
   };
 
@@ -226,16 +243,10 @@ let configureDungeon = () => {
       return;
     }
     if (
-      DungeonRunner.map.currentTile().type() ===
-        GameConstants.DungeonTile.boss &&
-      !wantedChestsStillPresents()
-    ) {
-      interact();
-      return;
-    }
-    if (
-      DungeonRunner.map.currentTile().type() ===
-        GameConstants.DungeonTile.ladder &&
+      [
+        GameConstants.DungeonTile.boss,
+        GameConstants.DungeonTile.ladder,
+      ].includes(DungeonRunner.map.currentTile().type()) &&
       !wantedChestsStillPresents()
     ) {
       interact();
@@ -347,7 +358,7 @@ let configureDungeon = () => {
   const aStarAlgorithm = (start, end) => {
     try {
       if (start.x === end.x && start.y === end.y) {
-        console.log("Already on the tile");
+        verbose && console.log("Already on the tile");
         return null;
       }
       let openSet = [
@@ -435,7 +446,7 @@ let configureDungeon = () => {
     const row = board.children[y];
     const tile = row.children[x];
     if (!tile) {
-      console.log("Not found", id, x, y);
+      verbose && console.log("Not found", id, x, y);
       return 1_000_000;
     }
     if (tile.classList.contains("tile-invisible")) {
