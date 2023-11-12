@@ -209,6 +209,12 @@ let configureDungeon = () => {
       return false;
     }
     verbose && console.log("Go to boss");
+    const event = new MouseEvent("click");
+    const bossTile = document.querySelector(".tile-boss, .tile-ladder");
+    if (bossTile) {
+      bossTile.dispatchEvent(event);
+      DungeonRunner.handleInteraction();
+    }
     return goToTile(positionXBoss, positionYBoss);
   };
 
