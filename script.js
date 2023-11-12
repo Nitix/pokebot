@@ -13,7 +13,7 @@ let startDungeon = (init = false, options = {}) => {
 
   if (options) {
     if (options.chestMode) {
-      chestMode = options[key];
+      chestMode = options.chestMode;
     }
     if (options.verbose) {
       verbose = options.verbose;
