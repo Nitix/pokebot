@@ -11,19 +11,13 @@ let startDungeon = (init = false, options = {}) => {
     stop = false;
   }
 
-  if (options && Object.keys(options).length) {
-    Object.keys(options).forEach((key) => {
-      switch (key) {
-        case "chestMode":
-          chestMode = options[key];
-          break;
-        case "verbose":
-          verbose = options[key];
-          break;
-        default:
-          break;
-      }
-    });
+  if (options) {
+    if (options.chestMode) {
+      chestMode = options.chestMode;
+    }
+    if (options.verbose) {
+      verbose = options.verbose;
+    }
   }
 
   if (stop) {
@@ -209,6 +203,12 @@ let configureDungeon = () => {
       return false;
     }
     verbose && console.log("Go to boss");
+    const event = new MouseEvent("click");
+    const bossTile = document.querySelector(".tile-boss, .tile-ladder");
+    if (bossTile) {
+      bossTile.dispatchEvent(event);
+      DungeonRunner.handleInteraction();
+    }
     return goToTile(positionXBoss, positionYBoss);
   };
 
