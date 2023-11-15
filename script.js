@@ -33,6 +33,10 @@ let startDungeon = (init = false, options = {}) => {
   }
 };
 
+let stopDungeon = () => {
+  stop = true;
+};
+
 let isDungeonStillRunning = () => document.querySelector(".dungeon-board");
 
 let configureDungeon = () => {
