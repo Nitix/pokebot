@@ -6,4 +6,4 @@ help: 			## Show this help
 
 install: 		## Install script in pokeclicker client
 	@mkdir -p ~/.config/pokeclicker-desktop/scripts
-	@cp script.js ~/.config/pokeclicker-desktop/scripts/script.js
+	@cp -R scripts/ ~/.config/pokeclicker-desktop/
