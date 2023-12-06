@@ -1,4 +1,4 @@
-class AutoDungeonV2 {
+class AutoChestDungeon {
   static #startButtonSelector =
     "#townView > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > button:nth-child(1)";
   static #stop = false;
@@ -6,20 +6,20 @@ class AutoDungeonV2 {
   static verbose = false;
 
   static start(options = {}) {
-    AutoDungeonV2.#stop = false;
+    AutoChestDungeon.#stop = false;
     if (options) {
       if (options.chestMode) {
-        AutoDungeonV2.chestMode = options.chestMode;
+        AutoChestDungeon.chestMode = options.chestMode;
       }
       if (options.verbose) {
-        AutoDungeonV2.verbose = options.verbose;
+        AutoChestDungeon.verbose = options.verbose;
       }
     }
-    AutoDungeonV2.#startDungeon();
+    AutoChestDungeon.#startDungeon();
   }
 
   static stop() {
-    AutoDungeonV2.#stop = true;
+    AutoChestDungeon.#stop = true;
   }
 
   #size;
@@ -54,20 +54,20 @@ class AutoDungeonV2 {
   }
 
   static #startRunner() {
-    if (AutoDungeonV2.#stop) {
+    if (AutoChestDungeon.#stop) {
       return;
     }
-    new AutoDungeonV2();
+    new AutoChestDungeon();
   }
 
   static #startDungeon() {
-    if (AutoDungeonV2.#stop) {
+    if (AutoChestDungeon.#stop) {
       return;
     }
-    const button = document.querySelector(AutoDungeonV2.#startButtonSelector);
+    const button = document.querySelector(AutoChestDungeon.#startButtonSelector);
     if (button) {
       button.click();
-      requestAnimationFrame(AutoDungeonV2.#startRunner.bind(this));
+      requestAnimationFrame(AutoChestDungeon.#startRunner.bind(this));
       return;
     }
   }
@@ -155,12 +155,12 @@ class AutoDungeonV2 {
   }
 
   #wantedChestsStillPresents() {
-    const chests = this.#wantedChests(AutoDungeonV2.chestMode);
+    const chests = this.#wantedChests(AutoChestDungeon.chestMode);
     return chests.length > 0 || !this.#allChestsDiscovered();
   }
 
   #moveUp(ignoreSettingPosition = false) {
-    AutoDungeonV2.verbose && console.log("Moving up");
+    AutoChestDungeon.verbose && console.log("Moving up");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowUp",
       code: "ArrowUp",
@@ -175,7 +175,7 @@ class AutoDungeonV2 {
   }
 
   #moveDown(ignoreSettingPosition = false) {
-    AutoDungeonV2.verbose && console.log("Moving down");
+    AutoChestDungeon.verbose && console.log("Moving down");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowDown",
       code: "ArrowDown",
@@ -190,7 +190,7 @@ class AutoDungeonV2 {
   }
 
   #moveLeft(ignoreSettingPosition = false) {
-    AutoDungeonV2.verbose && console.log("Moving left");
+    AutoChestDungeon.verbose && console.log("Moving left");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowLeft",
       code: "ArrowLeft",
@@ -208,7 +208,7 @@ class AutoDungeonV2 {
   }
 
   #moveRight(ignoreSettingPosition = false) {
-    AutoDungeonV2.verbose && console.log("Moving right");
+    AutoChestDungeon.verbose && console.log("Moving right");
     const event = new KeyboardEvent("keydown", {
       key: "ArrowRight",
       code: "ArrowRight",
@@ -230,7 +230,7 @@ class AutoDungeonV2 {
     if (this.#positionXChest === null || this.#positionYChest === null) {
       return false;
     }
-    AutoDungeonV2.verbose &&
+    AutoChestDungeon.verbose &&
       console.log(`Go to ${this.#chosenChestName} chest`);
     return this.#goToTile(this.#positionXChest, this.#positionYChest);
   }
@@ -278,7 +278,7 @@ class AutoDungeonV2 {
     if (this.#positionXBoss === null && this.#positionYBoss === null) {
       return false;
     }
-    AutoDungeonV2.verbose && console.log("Go to boss");
+    AutoChestDungeon.verbose && console.log("Go to boss");
     const bossTile = document.querySelector(".tile-boss, .tile-ladder");
     if (bossTile && this.#isBossTileClickable()) {
       const event = new MouseEvent("click");
@@ -339,12 +339,12 @@ class AutoDungeonV2 {
   }
 
   #move() {
-    if (AutoDungeonV2.#stop) {
+    if (AutoChestDungeon.#stop) {
       return;
     }
-    if (!AutoDungeonV2.isDungeonStillRunning()) {
+    if (!AutoChestDungeon.isDungeonStillRunning()) {
       console.log("Dungeon finished");
-      requestAnimationFrame(AutoDungeonV2.#startDungeon.bind(this));
+      requestAnimationFrame(AutoChestDungeon.#startDungeon.bind(this));
       return;
     }
 
@@ -356,12 +356,12 @@ class AutoDungeonV2 {
     this.#getCurrentPlayerPosition();
     if (this.#sizeChanged) {
       console.log("Dungeon size changed");
-      requestAnimationFrame(AutoDungeonV2.#startRunner.bind(this));
+      requestAnimationFrame(AutoChestDungeon.#startRunner.bind(this));
       return;
     }
 
-    if (AutoDungeonV2.chestMode) {
-      if (this.#moveToChest(AutoDungeonV2.chestMode)) {
+    if (AutoChestDungeon.chestMode) {
+      if (this.#moveToChest(AutoChestDungeon.chestMode)) {
         return;
       }
       if (!this.#wantedChestsStillPresents() && this.#moveToBoss()) {
@@ -444,12 +444,12 @@ class AutoDungeonV2 {
   }
 
   #interact() {
-    if (AutoDungeonV2.#stop) {
+    if (AutoChestDungeon.#stop) {
       return;
     }
-    if (!AutoDungeonV2.isDungeonStillRunning()) {
+    if (!AutoChestDungeon.isDungeonStillRunning()) {
       console.log("Dungeon finished");
-      requestAnimationFrame(AutoDungeonV2.#startDungeon.bind(this));
+      requestAnimationFrame(AutoChestDungeon.#startDungeon.bind(this));
       return;
     }
     this.#getCurrentPlayerPosition();

@@ -100,7 +100,7 @@ class DungeonAStar {
     const row = board.children[y];
     const tile = row.children[x];
     if (!tile) {
-      AutoDungeon.verbose && console.log("Not found", id, x, y);
+      AutoBattleDungeon.verbose && console.log("Not found", id, x, y);
       return 1_000_000;
     }
     if (tile.classList.contains("tile-invisible")) {
