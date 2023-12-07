@@ -1,8 +1,11 @@
 class AutoClicker {
   static intervalTimer = null;
-  static speed = 100;
+  static #speed = 100;
 
   static start() {
+    if (AutoClicker.intervalTimer) {
+      return;
+    }
     AutoClicker.intervalTimer = setInterval(() => {
       if (App.game.gameState === GameConstants.GameState.dungeon) {
         if (DungeonRunner.fighting()) {
@@ -22,10 +25,16 @@ class AutoClicker {
         Battle.clickAttack();
         return;
       }
-    }, AutoClicker.speed);
+    }, AutoClicker.#speed);
   }
 
   static stop() {
     clearInterval(AutoClicker.intervalTimer);
+  }
+
+  static speed(speed) {
+    AutoClicker.#speed = speed;
+    AutoClicker.stop();
+    AutoClicker.start();
   }
 }

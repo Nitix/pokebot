@@ -12,7 +12,10 @@ class AutoFrontier {
 
   static start() {
     AutoFrontier.runFrontier();
-    setInterval(AutoFrontier.runFrontier, 30000);
+    if (AutoFrontier.interval) {
+      return;
+    }
+    AutoFrontier.interval = setInterval(AutoFrontier.runFrontier, 30000);
   }
 
   static stop() {
