@@ -20,5 +20,6 @@ class AutoFrontier {
 
   static stop() {
     clearInterval(this.interval);
+    this.interval = null;
   }
 }

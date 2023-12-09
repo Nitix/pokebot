@@ -30,10 +30,14 @@ class AutoClicker {
 
   static stop() {
     clearInterval(AutoClicker.intervalTimer);
+    this.intervalTimer = null;
   }
 
   static speed(speed) {
     AutoClicker.#speed = speed;
+    if (!AutoClicker.intervalTimer) {
+      return;
+    }
     AutoClicker.stop();
     AutoClicker.start();
   }
