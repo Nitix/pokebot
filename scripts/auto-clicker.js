@@ -18,7 +18,7 @@ class AutoClicker {
         return;
       }
       if (App.game.gameState === GameConstants.GameState.temporaryBattle) {
-        TemporaryBattleBattle.enemyPokemon();
+        TemporaryBattleBattle.clickAttack();
         return;
       }
       if (App.game.gameState === GameConstants.GameState.fighting) {
