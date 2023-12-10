@@ -1,7 +1,7 @@
 class AutoChestDungeon {
   static #startButtonSelector =
     "#townView > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > button:nth-child(1)";
-  static #stop = false;
+  static #stop = true;
   static chestMode = ["rare", "epic", "legendary", "mythic"];
   static verbose = false;
 
@@ -20,6 +20,10 @@ class AutoChestDungeon {
 
   static stop() {
     AutoChestDungeon.#stop = true;
+  }
+
+  static isRunning() {
+    return !AutoChestDungeon.#stop;
   }
 
   #size;
@@ -64,7 +68,9 @@ class AutoChestDungeon {
     if (AutoChestDungeon.#stop) {
       return;
     }
-    const button = document.querySelector(AutoChestDungeon.#startButtonSelector);
+    const button = document.querySelector(
+      AutoChestDungeon.#startButtonSelector
+    );
     if (button) {
       button.click();
       requestAnimationFrame(AutoChestDungeon.#startRunner.bind(this));

@@ -33,6 +33,10 @@ class AutoClicker {
     this.intervalTimer = null;
   }
 
+  static isRunning() {
+    return !!AutoClicker.intervalTimer;
+  }
+
   static speed(speed) {
     AutoClicker.#speed = speed;
     if (!AutoClicker.intervalTimer) {

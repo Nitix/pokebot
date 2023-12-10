@@ -22,4 +22,8 @@ class AutoFrontier {
     clearInterval(this.interval);
     this.interval = null;
   }
+
+  static isRunning() {
+    return !!this.interval;
+  }
 }

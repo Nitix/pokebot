@@ -1,7 +1,7 @@
 class AutoBattleDungeon {
   static #startButtonSelector =
     "#townView > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > button:nth-child(1)";
-  static #stop = false;
+  static #stop = true;
   static chestMode = ["rare", "epic", "legendary", "mythic"];
   static verbose = false;
 
@@ -22,6 +22,10 @@ class AutoBattleDungeon {
     AutoBattleDungeon.#stop = true;
   }
 
+  static isRunning() {
+    return !AutoBattleDungeon.#stop;
+  }
+
   #size;
   #middle;
   #positionX;
@@ -35,6 +39,7 @@ class AutoBattleDungeon {
   #hasMoveLeftOrRightOnce = false;
 
   constructor() {
+    AutoBattleDungeon.running = true;
     this.#size = document.querySelector(
       ".dungeon-board > tbody:nth-child(1)"
     ).children.length;
