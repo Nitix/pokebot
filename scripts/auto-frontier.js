@@ -16,6 +16,7 @@ class AutoFrontier {
       return;
     }
     AutoFrontier.interval = setInterval(AutoFrontier.runFrontier, 30000);
+    return true;
   }
 
   static stop() {

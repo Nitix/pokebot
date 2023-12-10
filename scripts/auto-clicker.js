@@ -26,6 +26,7 @@ class AutoClicker {
         return;
       }
     }, AutoClicker.#speed);
+    return true;
   }
 
   static stop() {

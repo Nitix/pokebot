@@ -15,7 +15,7 @@ class AutoChestDungeon {
         AutoChestDungeon.verbose = options.verbose;
       }
     }
-    AutoChestDungeon.#startDungeon();
+    return AutoChestDungeon.#startDungeon();
   }
 
   static stop() {
@@ -74,8 +74,19 @@ class AutoChestDungeon {
     if (button) {
       button.click();
       requestAnimationFrame(AutoChestDungeon.#startRunner.bind(this));
-      return;
+      return true;
     }
+
+    if (this.isDungeonStillRunning()) {
+      requestAnimationFrame(AutoChestDungeon.#startRunner.bind(this));
+
+      return true;
+    }
+    AutoChestDungeon.#stop = true;
+    Notifier.notify({
+      message: "Please be in the dungeon to start the auto chest dungeon",
+    });
+    return false;
   }
 
   static isDungeonStillRunning = () => document.querySelector(".dungeon-board");

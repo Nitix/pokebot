@@ -15,7 +15,7 @@ class AutoBattleDungeon {
         AutoBattleDungeon.verbose = options.verbose;
       }
     }
-    AutoBattleDungeon.#startDungeon();
+    return AutoBattleDungeon.#startDungeon();
   }
 
   static stop() {
@@ -39,7 +39,6 @@ class AutoBattleDungeon {
   #hasMoveLeftOrRightOnce = false;
 
   constructor() {
-    AutoBattleDungeon.running = true;
     this.#size = document.querySelector(
       ".dungeon-board > tbody:nth-child(1)"
     ).children.length;
@@ -63,11 +62,20 @@ class AutoBattleDungeon {
     const button = document.querySelector(
       AutoBattleDungeon.#startButtonSelector
     );
-    if (button) {
+    if (button && player.town() instanceof DungeonTown) {
       button.click();
       requestAnimationFrame(AutoBattleDungeon.#startRunner.bind(this));
-      return;
+      return true;
     }
+    if (this.isDungeonStillRunning()) {
+      requestAnimationFrame(AutoBattleDungeon.#startRunner.bind(this));
+      return true;
+    }
+    AutoBattleDungeon.#stop = true;
+    Notifier.notify({
+      message: "Please be in the dungeon to start the auto battle dungeon",
+    });
+    return false;
   }
 
   static isDungeonStillRunning = () => document.querySelector(".dungeon-board");
