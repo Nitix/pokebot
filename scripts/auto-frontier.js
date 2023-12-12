@@ -1,15 +1,30 @@
-let startFrontier = (forceStart = false) => {
-  if (forceStart) {
-    stop = false;
+class AutoFrontier {
+  static interval;
+
+  static runFrontier() {
+    const button = document.querySelector(
+      "#battleFrontierInformation > div.card-body.text-center > a:nth-child(3)"
+    );
+    if (button) {
+      button.click();
+    }
   }
-  if (stop) {
-    return;
+
+  static start() {
+    AutoFrontier.runFrontier();
+    if (AutoFrontier.interval) {
+      return;
+    }
+    AutoFrontier.interval = setInterval(AutoFrontier.runFrontier, 30000);
+    return true;
   }
-  const button = document.querySelector(
-    "#battleFrontierInformation > div.card-body.text-center > a:nth-child(3)"
-  );
-  if (button) {
-    button.click();
+
+  static stop() {
+    clearInterval(this.interval);
+    this.interval = null;
   }
-  setTimeout(startFrontier, 30000);
-};
+
+  static isRunning() {
+    return !!this.interval;
+  }
+}
