@@ -1,30 +1,24 @@
 class AutoFrontier {
-  static interval;
-
-  static runFrontier() {
-    const button = document.querySelector(
-      "#battleFrontierInformation > div.card-body.text-center > a:nth-child(3)"
-    );
-    if (button) {
-      button.click();
-    }
-  }
+  static originalMethod = null;
 
   static start() {
-    AutoFrontier.runFrontier();
-    if (AutoFrontier.interval) {
+    if (AutoFrontier.originalMethod) {
       return;
     }
-    AutoFrontier.interval = setInterval(AutoFrontier.runFrontier, 30000);
+    AutoFrontier.originalMethod = BattleFrontierRunner.battleLost;
+    BattleFrontierRunner.battleLost = () => {
+      AutoFrontier.originalMethod();
+      BattleFrontierRunner.start();
+    };
     return true;
   }
 
   static stop() {
-    clearInterval(this.interval);
-    this.interval = null;
+    BattleFrontierRunner.battleLost = AutoFrontier.originalMethod;
+    AutoFrontier.originalMethod = null;
   }
 
   static isRunning() {
-    return !!this.interval;
+    return !!AutoFrontier.originalMethod;
   }
 }
