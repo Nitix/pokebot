@@ -15,6 +15,7 @@ const configurationVisualConfig = () => {
   tr.appendChild(createConfButton("Auto Battle Dungeon", AutoBattleDungeon));
   tr.appendChild(createConfButton("Auto Battle Frontier", AutoFrontier));
   tr.appendChild(createConfButton("Auto Clicker", AutoClicker));
+  tr.appendChild(createConfButton("Auto Gym", AutoGym));
   table.appendChild(tr);
 
   document
@@ -51,4 +52,4 @@ const createConfButton = (text, runner) => {
   return td;
 };
 
-setTimeout(configurationVisualConfig, 1000);
+setTimeout(configurationVisualConfig, 2000);
