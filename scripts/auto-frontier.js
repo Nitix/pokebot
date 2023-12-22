@@ -1,24 +1,25 @@
 class AutoFrontier {
-  static originalMethod = null;
+  static custom = false;
 
   static start() {
-    if (AutoFrontier.originalMethod) {
+    if (AutoFrontier.custom) {
       return;
     }
-    AutoFrontier.originalMethod = BattleFrontierRunner.battleLost;
+    BattleFrontierRunner.originalBattleLost = BattleFrontierRunner.battleLost;
     BattleFrontierRunner.battleLost = () => {
-      AutoFrontier.originalMethod();
+      BattleFrontierRunner.originalBattleLost();
       BattleFrontierRunner.start();
     };
+    AutoFrontier.custom = true;
     return true;
   }
 
   static stop() {
-    BattleFrontierRunner.battleLost = AutoFrontier.originalMethod;
-    AutoFrontier.originalMethod = null;
+    BattleFrontierRunner.battleLost = BattleFrontierRunner.originalBattleLost;
+    AutoFrontier.custom = false;
   }
 
   static isRunning() {
-    return !!AutoFrontier.originalMethod;
+    return AutoFrontier.custom;
   }
 }

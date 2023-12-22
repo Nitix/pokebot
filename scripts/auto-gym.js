@@ -1,24 +1,25 @@
 class AutoGym {
-  static originalMethod = null;
+  static custom = false;
 
   static start() {
-    if (AutoGym.originalMethod) {
+    if (AutoGym.custom) {
       return;
     }
-    AutoGym.originalMethod = GymRunner.gymWon;
+    GymRunner.originalGymWon = GymRunner.gymWon;
     GymRunner.gymWon = (gym) => {
-      AutoGym.originalMethod(gym);
+      GymRunner.originalGymWon(gym);
       GymRunner.startGym(gym);
     };
+    AutoGym.custom = true;
     return true;
   }
 
   static stop() {
-    GymRunner.gymWon = AutoGym.originalMethod;
-    AutoGym.originalMethod = null;
+    GymRunner.gymWon = GymRunner.originalGymWon;
+    AutoGym.custom = false;
   }
 
   static isRunning() {
-    return !!AutoGym.originalMethod;
+    return AutoGym.custom;
   }
 }
