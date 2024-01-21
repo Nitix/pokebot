@@ -18,9 +18,7 @@ const configurationVisualConfig = () => {
   tr.appendChild(createConfButton("Auto Gym", AutoGym));
   table.appendChild(tr);
 
-  document
-    .querySelector("#battleContainer > div.card-header.p-0")
-    .appendChild(div);
+  document.querySelector("#battleContainer").prepend(div);
 };
 
 const createConfButton = (text, runner) => {
