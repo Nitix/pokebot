@@ -7,10 +7,9 @@ class AutoGym {
       return;
     }
     AutoGym.loadDefaultConfig(true);
-    GymRunner.originalGymWon = GymRunner.gymWon;
-    GymRunner.gymWon = (gym) => {
-      GymRunner.originalGymWon(gym);
-      GymRunner.startGym(gym);
+    GymRunner.originalStartGym = GymRunner.startGym;
+    GymRunner.startGym = (gym, auto) => {
+      GymRunner.originalStartGym(gym, AutoGym.custom || auto);
     };
     AutoGym.optimizeConfigs();
     AutoGym.custom = true;
@@ -18,7 +17,7 @@ class AutoGym {
   }
 
   static stop() {
-    GymRunner.gymWon = GymRunner.originalGymWon;
+    GymRunner.startGym = GymRunner.originalStartGym;
     AutoGym.custom = false;
     AutoGym.restoreDefaultConfig();
   }
