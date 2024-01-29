@@ -23,6 +23,7 @@ class DungeonAStar {
           fScore: DungeonAStar.#distance(start, end),
         },
       ];
+      let checkedSet = [];
       while (openSet.length) {
         let current = openSet.reduce((prev, current) => {
           if (!prev) {
@@ -42,6 +43,7 @@ class DungeonAStar {
           return path[path.length - 2];
         }
         openSet = openSet.filter((e) => e !== current);
+        checkedSet.push(current);
         const neighbors = [
           { x: current.x - 1, y: current.y },
           { x: current.x + 1, y: current.y },
@@ -74,6 +76,15 @@ class DungeonAStar {
               existing.parent = current;
             }
           } else {
+            const existingChecked = checkedSet.find(
+              (e) => e.x === neighbor.x && e.y === neighbor.y
+            );
+            if (existingChecked) {
+              if (existingChecked.gScore < gScore) {
+                continue;
+              }
+              checkedSet = checkedSet.filter((e) => e !== existingChecked);
+            }
             openSet.push({
               x: neighbor.x,
               y: neighbor.y,
