@@ -429,16 +429,17 @@ class AutoChestDungeon {
       }
     }
 
-    if (
-      this.#wantedPositionX !== null &&
-      this.#wantedPositionY !== null &&
-      (this.#wantedPositionX !== this.#positionX ||
-        this.#wantedPositionY !== this.#positionY)
-    ) {
-      if (this.#goToTile(this.#wantedPositionX, this.#wantedPositionY)) {
+    if (this.#wantedPositionX !== null && this.#wantedPositionY !== null) {
+      if (
+        this.#wantedPositionX !== this.#positionX ||
+        this.#wantedPositionY !== this.#positionY
+      ) {
+        if (this.#goToTile(this.#wantedPositionX, this.#wantedPositionY)) {
+          return;
+        }
+      } else {
         this.#wantedPositionX = null;
         this.#wantedPositionY = null;
-        return;
       }
     }
 
