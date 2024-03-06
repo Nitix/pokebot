@@ -438,6 +438,18 @@ class AutoChestDungeon {
           return;
         }
       } else {
+        if (this.#wantedPositionX === 0) {
+          this.#moveToLeft = false;
+        }
+        if (this.#wantedPositionX === this.#size - 1) {
+          this.#moveToLeft = true;
+        }
+        if (this.#wantedPositionY === 0) {
+          this.#moveToDown = false;
+        }
+        if (this.#wantedPositionY === this.#size - 1) {
+          this.#moveToDown = true;
+        }
         this.#wantedPositionX = null;
         this.#wantedPositionY = null;
       }
