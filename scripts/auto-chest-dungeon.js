@@ -51,8 +51,6 @@ class AutoChestDungeon {
     this.#middle = Math.floor(this.#size / 2);
     this.#positionX = this.#middle;
     this.#positionY = this.#size - 1;
-    this.#wantedPositionX = this.#positionX;
-    this.#wantedPositionY = this.#positionY;
     this.#flashSize = DungeonRunner.map.flash?.playerOffset[0] ?? 0;
     requestAnimationFrame(this.#move.bind(this));
   }
@@ -396,10 +394,14 @@ class AutoChestDungeon {
     }
 
     if (
-      this.#wantedPositionX !== this.#positionX ||
-      this.#wantedPositionY !== this.#positionY
+      this.#wantedPositionX !== null &&
+      this.#wantedPositionY !== null &&
+      (this.#wantedPositionX !== this.#positionX ||
+        this.#wantedPositionY !== this.#positionY)
     ) {
       if (this.#goToTile(this.#wantedPositionX, this.#wantedPositionY)) {
+        this.#wantedPositionX = null;
+        this.#wantedPositionY = null;
         return;
       }
     }
