@@ -43,6 +43,7 @@ class AutoChestDungeon {
   #flashSize = 0;
   #wantedPositionX = null;
   #wantedPositionY = null;
+  #lastActions = [];
 
   constructor() {
     this.#size = document.querySelector(
@@ -174,6 +175,24 @@ class AutoChestDungeon {
     return chests.length > 0 || !this.#allChestsDiscovered();
   }
 
+  #addLastAction(action) {
+    this.#lastActions.push(action);
+    if (this.#lastActions.length > 5) {
+      this.#lastActions.shift();
+    }
+  }
+
+  #detectStuck() {
+    if (this.#lastActions.length < 7) {
+      return false;
+    }
+    const lastActions = this.#lastActions.join("");
+    return (
+      lastActions.includes("updownupdown") ||
+      lastActions.includes("leftrightleftright")
+    );
+  }
+
   #moveUp(ignoreSettingPosition = false) {
     AutoChestDungeon.verbose && console.log("Moving up");
     const event = new KeyboardEvent("keydown", {
@@ -186,6 +205,7 @@ class AutoChestDungeon {
       this.#wantedPositionX = this.#positionX;
       this.#wantedPositionY = Math.max(0, this.#positionY - 1);
     }
+    this.#addLastAction("up");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -201,6 +221,7 @@ class AutoChestDungeon {
       this.#wantedPositionX = this.#positionX;
       this.#wantedPositionY = Math.min(this.#size - 1, this.#positionY + 1);
     }
+    this.#addLastAction("down");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -219,6 +240,7 @@ class AutoChestDungeon {
       this.#wantedPositionX = Math.max(0, this.#positionX - 1);
       this.#wantedPositionY = this.#positionY;
     }
+    this.#addLastAction("left");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -237,6 +259,7 @@ class AutoChestDungeon {
       this.#wantedPositionX = Math.min(this.#size - 1, this.#positionX + 1);
       this.#wantedPositionY = this.#positionY;
     }
+    this.#addLastAction("right");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -373,6 +396,19 @@ class AutoChestDungeon {
       console.log("Dungeon size changed");
       requestAnimationFrame(AutoChestDungeon.#startRunner.bind(this));
       return;
+    }
+
+    if (this.#detectStuck()) {
+      console.log("Stuck detected");
+      if (this.#positionY < 2) {
+        if (this.#moveDown()) {
+          return;
+        }
+      } else {
+        if (this.#moveUp()) {
+          return;
+        }
+      }
     }
 
     if (AutoChestDungeon.chestMode) {
