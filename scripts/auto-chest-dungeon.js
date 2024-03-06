@@ -231,10 +231,6 @@ class AutoChestDungeon {
       key: "ArrowLeft",
       code: "ArrowLeft",
     });
-    if (this.#hasMoveUpOrDownOnce) {
-      this.#moveToDown = !this.#moveToDown;
-      this.#hasMoveUpOrDownOnce = false;
-    }
     document.dispatchEvent(event);
     if (!ignoreSettingPosition) {
       this.#wantedPositionX = Math.max(0, this.#positionX - 1);
@@ -250,10 +246,6 @@ class AutoChestDungeon {
       key: "ArrowRight",
       code: "ArrowRight",
     });
-    if (this.#hasMoveUpOrDownOnce) {
-      this.#moveToDown = !this.#moveToDown;
-      this.#hasMoveUpOrDownOnce = false;
-    }
     document.dispatchEvent(event);
     if (!ignoreSettingPosition) {
       this.#wantedPositionX = Math.min(this.#size - 1, this.#positionX + 1);
@@ -424,7 +416,7 @@ class AutoChestDungeon {
         return;
       }
     } else {
-      if (!this.#moveToLeft && this.#moveToBoss()) {
+      if (this.#moveToBoss()) {
         return;
       }
     }
@@ -456,6 +448,10 @@ class AutoChestDungeon {
     }
 
     const moveToLeftOrRight = () => {
+      if (this.#hasMoveUpOrDownOnce) {
+        this.#hasMoveUpOrDownOnce = false;
+        this.#moveToDown = !this.#moveToDown;
+      }
       if (this.#moveToLeft) {
         if (this.#positionX <= 0 + this.#flashSize) {
           this.#moveToLeft = false;
