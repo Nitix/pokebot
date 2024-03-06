@@ -183,7 +183,7 @@ class AutoChestDungeon {
   }
 
   #detectStuck() {
-    if (this.#lastActions.length < 7) {
+    if (this.#lastActions.length < 5) {
       return false;
     }
     const lastActions = this.#lastActions.join("");
