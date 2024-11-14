@@ -1,6 +1,6 @@
 class AutoChestDungeon {
   static #startButtonSelector =
-    "#townView > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > button:nth-child(1)";
+    "#townView > div:nth-child(2) > div.col-4.no-gutters > div > div > button.btn.btn-success.p-0";
   static #stop = true;
   static chestMode = ["rare", "epic", "legendary", "mythic"];
   static verbose = false;
@@ -335,7 +335,8 @@ class AutoChestDungeon {
 
   #chooseWhatToDo() {
     if (
-      DungeonRunner.map.currentTile().type() === GameConstants.DungeonTile.chest
+      DungeonRunner.map.currentTile().type() ===
+      GameConstants.DungeonTileType.chest
     ) {
       this.#openedChests++;
       this.#interact();
@@ -343,8 +344,8 @@ class AutoChestDungeon {
     }
     if (
       [
-        GameConstants.DungeonTile.boss,
-        GameConstants.DungeonTile.ladder,
+        GameConstants.DungeonTileType.boss,
+        GameConstants.DungeonTileType.ladder,
       ].includes(DungeonRunner.map.currentTile().type()) &&
       !this.#wantedChestsStillPresents()
     ) {
