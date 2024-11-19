@@ -62,7 +62,7 @@ class AutoBattleDungeon {
     const button = document.querySelector(
       AutoBattleDungeon.#startButtonSelector
     );
-    if (button && player.town() instanceof DungeonTown) {
+    if (button) {
       button.click();
       requestAnimationFrame(AutoBattleDungeon.#startRunner.bind(this));
       return true;
