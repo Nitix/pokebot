@@ -43,6 +43,7 @@ class AutoChestDungeon {
   #flashSize = 0;
   #wantedPositionX = null;
   #wantedPositionY = null;
+  #lastActions = [];
 
   constructor() {
     this.#size = document.querySelector(
@@ -51,8 +52,6 @@ class AutoChestDungeon {
     this.#middle = Math.floor(this.#size / 2);
     this.#positionX = this.#middle;
     this.#positionY = this.#size - 1;
-    this.#wantedPositionX = this.#positionX;
-    this.#wantedPositionY = this.#positionY;
     this.#flashSize = DungeonRunner.map.flash?.playerOffset[0] ?? 0;
     requestAnimationFrame(this.#move.bind(this));
   }
@@ -176,6 +175,24 @@ class AutoChestDungeon {
     return chests.length > 0 || !this.#allChestsDiscovered();
   }
 
+  #addLastAction(action) {
+    this.#lastActions.push(action);
+    if (this.#lastActions.length > 5) {
+      this.#lastActions.shift();
+    }
+  }
+
+  #detectStuck() {
+    if (this.#lastActions.length < 5) {
+      return false;
+    }
+    const lastActions = this.#lastActions.join("");
+    return (
+      lastActions.includes("updownupdown") ||
+      lastActions.includes("leftrightleftright")
+    );
+  }
+
   #moveUp(ignoreSettingPosition = false) {
     AutoChestDungeon.verbose && console.log("Moving up");
     const event = new KeyboardEvent("keydown", {
@@ -188,6 +205,7 @@ class AutoChestDungeon {
       this.#wantedPositionX = this.#positionX;
       this.#wantedPositionY = Math.max(0, this.#positionY - 1);
     }
+    this.#addLastAction("up");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -203,6 +221,7 @@ class AutoChestDungeon {
       this.#wantedPositionX = this.#positionX;
       this.#wantedPositionY = Math.min(this.#size - 1, this.#positionY + 1);
     }
+    this.#addLastAction("down");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -212,15 +231,12 @@ class AutoChestDungeon {
       key: "ArrowLeft",
       code: "ArrowLeft",
     });
-    if (this.#hasMoveUpOrDownOnce) {
-      this.#moveToDown = !this.#moveToDown;
-      this.#hasMoveUpOrDownOnce = false;
-    }
     document.dispatchEvent(event);
     if (!ignoreSettingPosition) {
       this.#wantedPositionX = Math.max(0, this.#positionX - 1);
       this.#wantedPositionY = this.#positionY;
     }
+    this.#addLastAction("left");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -230,15 +246,12 @@ class AutoChestDungeon {
       key: "ArrowRight",
       code: "ArrowRight",
     });
-    if (this.#hasMoveUpOrDownOnce) {
-      this.#moveToDown = !this.#moveToDown;
-      this.#hasMoveUpOrDownOnce = false;
-    }
     document.dispatchEvent(event);
     if (!ignoreSettingPosition) {
       this.#wantedPositionX = Math.min(this.#size - 1, this.#positionX + 1);
       this.#wantedPositionY = this.#positionY;
     }
+    this.#addLastAction("right");
     requestAnimationFrame(this.#chooseWhatToDo.bind(this));
   }
 
@@ -378,6 +391,19 @@ class AutoChestDungeon {
       return;
     }
 
+    if (this.#detectStuck()) {
+      console.log("Stuck detected");
+      if (this.#positionY < 2) {
+        if (this.#moveDown()) {
+          return;
+        }
+      } else {
+        if (this.#moveUp()) {
+          return;
+        }
+      }
+    }
+
     if (AutoChestDungeon.chestMode) {
       if (this.#moveToChest(AutoChestDungeon.chestMode)) {
         return;
@@ -391,21 +417,42 @@ class AutoChestDungeon {
         return;
       }
     } else {
-      if (!this.#moveToLeft && this.#moveToBoss()) {
+      if (this.#moveToBoss()) {
         return;
       }
     }
 
-    if (
-      this.#wantedPositionX !== this.#positionX ||
-      this.#wantedPositionY !== this.#positionY
-    ) {
-      if (this.#goToTile(this.#wantedPositionX, this.#wantedPositionY)) {
-        return;
+    if (this.#wantedPositionX !== null && this.#wantedPositionY !== null) {
+      if (
+        this.#wantedPositionX !== this.#positionX ||
+        this.#wantedPositionY !== this.#positionY
+      ) {
+        if (this.#goToTile(this.#wantedPositionX, this.#wantedPositionY)) {
+          return;
+        }
+      } else {
+        if (this.#wantedPositionX === 0) {
+          this.#moveToLeft = false;
+        }
+        if (this.#wantedPositionX === this.#size - 1) {
+          this.#moveToLeft = true;
+        }
+        if (this.#wantedPositionY === 0) {
+          this.#moveToDown = false;
+        }
+        if (this.#wantedPositionY === this.#size - 1) {
+          this.#moveToDown = true;
+        }
+        this.#wantedPositionX = null;
+        this.#wantedPositionY = null;
       }
     }
 
     const moveToLeftOrRight = () => {
+      if (this.#hasMoveUpOrDownOnce) {
+        this.#hasMoveUpOrDownOnce = false;
+        this.#moveToDown = !this.#moveToDown;
+      }
       if (this.#moveToLeft) {
         if (this.#positionX <= 0 + this.#flashSize) {
           this.#moveToLeft = false;
